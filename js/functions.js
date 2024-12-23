@@ -79,8 +79,47 @@ const stage = {
     },
 
     doAttack(attacking, attacked) {
-        console.log(`${attacking.name} atacou ${attacked.name}`)
+        if(attacking.life > 0 && attacked.life <= 0) {
+            log.addMessage(`${attacked.name} já está morto.`)
+            return
+        } else if(attacked.life > 0 && attacking.life <= 0) {
+            log.addMessage(`${attacking.name}, você está morto.`)
+            return
+        }
+
+        const attackFactor = (Math.random() * 2).toFixed(2)
+        const defenseFactor = (Math.random() * 2).toFixed(2)
+
+        let actualAttack = attacking.attack * attackFactor
+        let actualDefense = attacked.defense * defenseFactor
+
+        if(actualAttack > actualDefense) {
+            attacking.attack += 0.5
+            attacked.life -= actualAttack
+            attacked.life = attacked.life < 0 ? 0 : attacked.life
+
+            log.addMessage(`${attacking.name} causou ${actualAttack.toFixed(2)} de dano em ${attacked.name} e ganhou <strong>0.5</strong> a mais em força de ataque.`)
+        } else {
+            attacked.defense += 0.5
+            log.addMessage(`${attacked.name} defendeu e ganhou <strong>0.5</strong> a mais em força de defesa.`)
+        }
 
         this.uptade()
+    }
+}
+
+const log = {
+    list: [],
+    addMessage(msg) {
+        this.list.push(msg)
+        this.render()
+    },
+    render() {
+        const logEl = document.querySelector('.log')
+        logEl.innerHTML = ''
+
+        for(let i in this.list) {
+            logEl.innerHTML += `<li>${this.list[i]}</li>`
+        }
     }
 }
